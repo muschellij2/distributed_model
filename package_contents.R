@@ -27,7 +27,7 @@ gradient_value = function(beta = NULL, df, formula, iteration_number = 0) {
 folder_names = function(synced_folder) {
   L = list(
     # this structure is the same on all sites
-    model_folder = file.path(synced_folder, "models"),
+    model_folder = file.path(synced_folder, "formulas"),
     gradients_folder = file.path(synced_folder, "gradients"),
     beta_folder = file.path(synced_folder, "betas"),
     converged_folder = file.path(synced_folder, "models")
@@ -115,9 +115,9 @@ get_current_beta = function(model_name, synced_folder) {
     iteration_number = beta_list$iteration_number_next
   }
   L = list(
-    beta = beta,
     iteration_number = iteration_number
   )
+  L$beta =  beta
   return(L)
 }
 
@@ -153,7 +153,7 @@ estimate_site_gradient = function(
   gradient_file = file.path(
     gradients_folder, 
     paste0(model_name, "-", 
-           "site", site_name, 
+           site_name, 
            sprintf("-iteration%04.0f", iteration_number),
            ".rds"))
   all_gradient_files = file.path(
@@ -244,7 +244,14 @@ estimate_new_beta = function(
       gradient = result$gradient
       total_sample_size = result$total_sample_size
       
-      if (max(abs(gradient) < tolerance)) {
+      if (is.null(beta)) {
+        beta = rep(0, length(gradient))
+        epsilon = 10
+      } else {
+        # see glm.control
+        epsilon = max(abs(gradient)/(beta + 0.1))
+      }
+      if (epsilon < tolerance) {
         print("Model has converged!")
         final_beta_list = list(
           beta = beta,

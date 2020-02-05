@@ -5,12 +5,13 @@ library(readr)
 synced_folder = "~/Dropbox/Projects/distributed_model"
 # this structure is the same on all sites
 fols = file.path(synced_folder, 
-                 c("models", "gradients", "final_models",
+                 c("formulas", "gradients", "models",
                    "betas"))
 sapply(fols, dir.create, showWarnings = FALSE)
-model_folder = file.path(synced_folder, "models")
+model_folder = file.path(synced_folder, "formulas")
 gradients_folder = file.path(synced_folder, "gradients")
 beta_folder = file.path(synced_folder, "betas")
+converged_folder = file.path(synced_folder, "models")
 # which model are we running
 model_name = "logistic_example"
 

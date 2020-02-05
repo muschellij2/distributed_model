@@ -1,3 +1,4 @@
+rm(list=ls())
 source("package_contents.R")
 #################################################
 # Different folder by site
