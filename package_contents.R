@@ -1,6 +1,10 @@
 
 gradient_value = function(beta = NULL, df, formula, 
-                          family = binomial(), iteration_number = 0) {
+                          family = binomial(), iteration_number = 0,
+                          shuffle_rows = TRUE) {
+  if (shuffle_rows) {
+    df = df[sample(nrow(df)), ]
+  }
   y = model.frame(formula, data = df)[,1]
   X = model.matrix(formula, data = df)
   cc = complete.cases(X)
@@ -11,6 +15,7 @@ gradient_value = function(beta = NULL, df, formula,
     beta = rep(0, ncol(X))
   }
   linkinv = family$linkinv
+  variance <- family$variance
   p = linkinv(X %*% beta)
   # expb = exp(X %*% beta)
   # p = expb / (1 + expb)
@@ -23,6 +28,30 @@ gradient_value = function(beta = NULL, df, formula,
     iteration_number = iteration_number
   )
   return(result)
+}
+
+
+use_glm_gradient_value = function(
+  beta = NULL, df, formula, 
+  family = binomial(), iteration_number = 0,
+  shuffle_rows = TRUE) {
+  
+  if (shuffle_rows) {
+    df = df[sample(nrow(df)), ]
+  }  
+  X = model.matrix(formula, data = df)
+  if (is.null(beta)) {
+    beta = rep(0, ncol(X))
+  }  
+  start = beta
+  print(start)
+  mod = glm(
+    formula = formula,
+    data = df,
+    family = family,
+    start = start,
+    control = list(maxit = 1))
+  return(mod)
 }
 
 
@@ -128,7 +157,8 @@ get_current_beta = function(model_name, synced_folder) {
 estimate_site_gradient = function(
   model_name, synced_folder, 
   site_name = "site1", dataset,
-  all_site_names = paste0("site", 1:3)) {
+  all_site_names = paste0("site", 1:3),
+  shuffle_rows = TRUE) {
   
   
   
@@ -187,11 +217,18 @@ estimate_site_gradient = function(
   } else {
     print(paste0("Creating Gradient, iteration ", 
                  iteration_number))
+    use_glm_gradient_value(beta = beta,
+                           df = dataset,
+                           formula = formula,
+                           family = family,
+                           iteration_number = iteration_number,
+                           shuffle_rows = shuffle_rows)
     grad = gradient_value(beta = beta, 
                           df = dataset, 
                           formula = formula, 
                           family = family,
-                          iteration_number = iteration_number)
+                          iteration_number = iteration_number,
+                          shuffle_rows = shuffle_rows)
     readr::write_rds(grad, gradient_file)
     rm(grad)
   }

@@ -63,11 +63,11 @@ Currently, the process that happens is as follows:
 2.  Current β estimates are pulled for the specified model. If no
     estimates exist, β is initialized to a vector of zeros.
 3.  `Xβ` is computed, which is \(\hat{y}\), and
-    \(\hat{varepsilon} = y - \hat{y}\). Then `\hat{\delta} =
-    X\hat{varepsilon}` is created and \(\bar{\delta}\) is used as the
-    vector of gradients to update \(\beta\)\`. Each site returns
-    \(\hat{\delta}\) and the sample size at that site so that they can
-    be combined to \(\bar{\delta}\).
+    \(\hat{varepsilon} = y - \hat{y}\). Then
+    \(\hat{\delta} = X\hat{varepsilon}\) is created and \(\bar{\delta}\)
+    is used as the vector of gradients to update \(\beta\)\`. Each site
+    returns \(\hat{\delta}\) and the sample size at that site so that
+    they can be combined to \(\bar{\delta}\).
 4.  The compute site gathers the \(\hat{\delta}\) and the sample sizes,
     and computes \(\bar{\delta}\), and then writes the updated
     \(\beta\).  
@@ -78,3 +78,6 @@ Currently, the process that happens is as follows:
 
 1.  Standard errors
 2.  Better diagnostics
+3.  Use Fisher scoring vs. gradient descent for better convergence rates
+    (<https://statmath.wu.ac.at/courses/heather_turner/glmCourse_001.pdf>).
+    This will solve the standard errors todo as well.
