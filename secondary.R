@@ -2,10 +2,11 @@ rm(list=ls())
 source("package_contents.R")
 # really the only thing you'd ever change after the first time
 model_name = "logistic_example"
-all_site_names = paste0("site", 1:3)
 
 # Fixed stuff by site
-site_name = paste0("site1")
+site_name = "site1"
+all_site_names = paste0("site", 1:3)
+
 
 for (site_name in all_site_names) {
   # data source is somewhere else

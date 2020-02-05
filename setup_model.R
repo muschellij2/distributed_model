@@ -18,7 +18,10 @@ model_name = "logistic_example"
 
 # setup new model
 formula = y ~ x1 + x2
+family = binomial()
 formula_file = file.path(model_folder, paste0(model_name, ".rds"))
 if (!file.exists(formula_file)) {
-  readr::write_rds(formula, formula_file)
+  L = list(formula = formula,
+           family = family)
+  readr::write_rds(L, formula_file)
 }

@@ -1,5 +1,6 @@
 
-gradient_value = function(beta = NULL, df, formula, iteration_number = 0) {
+gradient_value = function(beta = NULL, df, formula, 
+                          family = binomial(), iteration_number = 0) {
   y = model.frame(formula, data = df)[,1]
   X = model.matrix(formula, data = df)
   cc = complete.cases(X)
@@ -9,8 +10,10 @@ gradient_value = function(beta = NULL, df, formula, iteration_number = 0) {
   if (is.null(beta)) {
     beta = rep(0, ncol(X))
   }
-  expb = exp(X %*% beta)
-  p = expb / (1 + expb)
+  linkinv = family$linkinv
+  p = linkinv(X %*% beta)
+  # expb = exp(X %*% beta)
+  # p = expb / (1 + expb)
   p = c(p)
   gradient = colSums(X * (y - p))
   stopifnot(length(gradient) == length(beta))
@@ -143,7 +146,18 @@ estimate_site_gradient = function(
                 " You may need to contact processing site or check your ", 
                 "synced_folder"))
   } else {
-    formula = readr::read_rds(formula_file)
+    formula_list = readr::read_rds(formula_file)
+    formula = formula_list$formula
+    family = formula_list$family
+    if (is.character(family)) {
+      family = get(family, envir = .BaseNamespaceEnv)
+    }
+    if (is.function(family)) {
+      family = family()
+    }    
+    if (!inherits(family, "family")) {
+      stop("family specified is not a family object - see setup_model")
+    }    
   }
   
   res = get_current_beta(model_name, synced_folder)
@@ -176,6 +190,7 @@ estimate_site_gradient = function(
     grad = gradient_value(beta = beta, 
                           df = dataset, 
                           formula = formula, 
+                          family = family,
                           iteration_number = iteration_number)
     readr::write_rds(grad, gradient_file)
     rm(grad)
