@@ -125,12 +125,30 @@ get_current_beta = function(model_name, synced_folder) {
 estimate_site_gradient = function(
   model_name, synced_folder, 
   site_name = "site1", dataset,
-  iteration_number,
   all_site_names = paste0("site", 1:3)) {
+  
+  
   
   site_name = match.arg(site_name, choices = all_site_names)
   file_list = folder_names(synced_folder)
   gradients_folder = file_list$gradients_folder
+  model_folder = file_list$model_folder
+  
+  # which model are we running
+  formula_file = file.path(model_folder, 
+                           paste0(model_name, ".rds"))
+  
+  if (!file.exists(formula_file)) {
+    stop(paste0("Formula file: ", formula_file, " doesn't exist!",
+                " You may need to contact processing site or check your ", 
+                "synced_folder"))
+  } else {
+    formula = readr::read_rds(formula_file)
+  }
+  
+  res = get_current_beta(model_name, synced_folder)
+  beta = res$beta
+  iteration_number = res$iteration_number  
   
   gradient_file = file.path(
     gradients_folder, 

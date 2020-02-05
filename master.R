@@ -25,18 +25,18 @@ run = estimate_new_beta(
   synced_folder, 
   all_site_names = all_site_names,
   tolerance = 1e-8)
-  
-if (file.exists(final_file)) {
-  formula_file = file.path(model_folder, paste0(model_name, ".rds"))
-  if (!file.exists(formula_file)) {
-    stop("Need to set up new model, see setup_model")
-  } else {
-    formula = readr::read_rds(formula_file)
-  }
-  
-  
-  res = get_current_beta(model_name, synced_folder)
-  beta = res$beta
-  iteration_number = res$iteration_number
-
-}
+#   
+# if (file.exists(final_file)) {
+#   formula_file = file.path(model_folder, paste0(model_name, ".rds"))
+#   if (!file.exists(formula_file)) {
+#     stop("Need to set up new model, see setup_model")
+#   } else {
+#     formula = readr::read_rds(formula_file)
+#   }
+#   
+#   
+#   res = get_current_beta(model_name, synced_folder)
+#   beta = res$beta
+#   iteration_number = res$iteration_number
+# 
+# }
