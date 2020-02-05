@@ -1,4 +1,5 @@
 
+# this is gradient descent
 gradient_value = function(beta = NULL, df, formula, 
                           family = binomial(), iteration_number = 0,
                           shuffle_rows = TRUE) {
@@ -16,11 +17,19 @@ gradient_value = function(beta = NULL, df, formula,
   }
   linkinv = family$linkinv
   variance <- family$variance
-  p = linkinv(X %*% beta)
+  mu.eta <- family$mu.eta
+  # dev.resids <- family$dev.resids
+  eta = drop(X %*% beta)
+  mu = linkinv(eta)
   # expb = exp(X %*% beta)
   # p = expb / (1 + expb)
-  p = c(p)
-  gradient = colSums(X * (y - p))
+  mu = c(mu)
+  W = (mu.eta(eta)^2) * variance(mu)
+  # gradient here is d_loglik/d_beta without variance components 
+  # gradient = drop(t(X) %*% (y - mu))
+  gradient = drop(t(X) %*% diag(W) %*% (y - mu))
+  #  h = 1 / (1 + exp(-eta))
+  # log_lik = -(t(y) %*% log(h) + t(1 - y) %*% log(1 - h))
   stopifnot(length(gradient) == length(beta))
   result = list(
     gradient = gradient,
@@ -40,6 +49,7 @@ use_glm_gradient_value = function(
     df = df[sample(nrow(df)), ]
   }  
   X = model.matrix(formula, data = df)
+  mu.eta <- family$mu.eta
   if (is.null(beta)) {
     beta = rep(0, ncol(X))
   }  
