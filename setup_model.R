@@ -1,6 +1,7 @@
 #################################################
 # Different folder by site
 #################################################
+source("package_contents.R")
 library(readr)
 synced_folder = "~/Dropbox/Projects/distributed_model"
 # this structure is the same on all sites
@@ -14,6 +15,7 @@ beta_folder = file.path(synced_folder, "betas")
 converged_folder = file.path(synced_folder, "models")
 # which model are we running
 model_name = "logistic_example"
+clear_model(model_name, synced_folder)
 
 
 # setup new model
@@ -25,3 +27,4 @@ if (!file.exists(formula_file)) {
            family = family)
   readr::write_rds(L, formula_file)
 }
+

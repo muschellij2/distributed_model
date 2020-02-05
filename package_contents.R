@@ -49,7 +49,7 @@ use_glm_gradient_value = function(
     df = df[sample(nrow(df)), ]
   }  
   X = model.matrix(formula, data = df)
-  mu.eta <- family$mu.eta
+  # mu.eta <- family$mu.eta
   if (is.null(beta)) {
     beta = rep(0, ncol(X))
   }  
@@ -128,8 +128,13 @@ aggregate_gradients = function(
   ss = sapply(gradient_list, function(x) x$sample_size)
   stopifnot(is.vector(ss))
   n = sum(ss)
-  
   grad = grad / n
+  
+  # weight the gradient updates - new way
+  sum_grads = sapply(gradient_list, function(x) {
+    x$gradient * x$sample_size / n
+  })
+  grad = rowSums(sum_grads)
   result = list(
     gradient = grad,
     total_sample_size = n)
@@ -227,12 +232,12 @@ estimate_site_gradient = function(
   } else {
     print(paste0("Creating Gradient, iteration ", 
                  iteration_number))
-    use_glm_gradient_value(beta = beta,
-                           df = dataset,
-                           formula = formula,
-                           family = family,
-                           iteration_number = iteration_number,
-                           shuffle_rows = shuffle_rows)
+    # use_glm_gradient_value(beta = beta,
+    #                        df = dataset,
+    #                        formula = formula,
+    #                        family = family,
+    #                        iteration_number = iteration_number,
+    #                        shuffle_rows = shuffle_rows)
     grad = gradient_value(beta = beta, 
                           df = dataset, 
                           formula = formula, 
