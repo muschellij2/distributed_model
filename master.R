@@ -25,7 +25,7 @@ run = estimate_new_beta(
   model_name, 
   synced_folder, 
   all_site_names = all_site_names,
-  tolerance = 1e-8)
+  tolerance = 1e-5)
 #   
 # if (file.exists(final_file)) {
 #   formula_file = file.path(model_folder, paste0(model_name, ".rds"))

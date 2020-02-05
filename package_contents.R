@@ -249,7 +249,7 @@ estimate_new_beta = function(
         epsilon = 10
       } else {
         # see glm.control
-        epsilon = max(abs(gradient)/(beta + 0.1))
+        epsilon = max(abs(gradient)/(abs(beta) + 0.1))
       }
       if (epsilon < tolerance) {
         print("Model has converged!")
@@ -258,6 +258,7 @@ estimate_new_beta = function(
           num_iterations = iteration_number,
           gradient = gradient,
           tolerance = tolerance,
+          epsilon = epsilon,
           total_sample_size = total_sample_size,
           max_gradient = max(abs(gradient)))
         readr::write_rds(final_beta_list, final_file)
@@ -268,7 +269,10 @@ estimate_new_beta = function(
         beta = beta,
         previous_gradient = gradient,
         total_sample_size = total_sample_size,
-        iteration_number_next = iteration_number +  1)
+        iteration_number_next = iteration_number +  1,
+        tolerance = tolerance,
+        epsilon = epsilon  
+      )
       readr::write_rds(beta_list, out_beta_file)
       rm(beta_list)
       return(out_beta_file)
@@ -284,3 +288,17 @@ estimate_new_beta = function(
   
 } 
 
+
+
+clear_model = function(
+  model_name, synced_folder
+) {
+  
+  file_list = folder_names(synced_folder)
+  files = sapply(file_list, function(x) {
+    list.files(path = x,
+               pattern = paste0("^", model_name, ".*.rds"),
+               full.names = TRUE)
+  })
+  file.remove(unlist(files))
+}
